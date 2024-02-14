@@ -14,7 +14,7 @@
   <div class="container flex flex-col justify-center space-y-5 items-center ">
     <h1 class="font-bold text-4xl mt-16">YouTube Video Ranking</h1>
 
-    <form class="flex flex-col p-24 space-y-4 border bg-slate-400 rounded-lg" id="urlForm">
+    <form class="form flex flex-col p-24 space-y-4 border bg-slate-400 rounded-lg" id="urlForm">
       <label class="text-lg font-semibold" for="youtubeUrl">Enter YouTube URL:</label>
       <input class="rounded-md p-1 shadow-lg w-96" type="text" id="youtubeUrl"
         placeholder="https://www.youtube.com/watch?v=VIDEO_ID" required>
@@ -29,17 +29,6 @@
     <div id="score"></div>
   </div>
   <div class="container"></div>
-  <!-- <div class="relative w-40 h-40">
-    <svg class="absolute" width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="45" fill="none" stroke="#3498db" stroke-width="10" stroke-dasharray="283"
-        stroke-dashoffset="0"></circle>
-      <circle class="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3498db" stroke-width="10"
-        stroke-dasharray="283" stroke-dashoffset="0"></circle>
-    </svg>
-    <div class="absolute inset-0 flex items-center justify-center">
-      <span class="text-blue-500 text-lg font-semibold" id="progressText">0%</span>
-    </div>
-  </div> -->
 
   <script>
     var a, b, score;
@@ -59,8 +48,26 @@
       ])
         .then(([likes, views]) => {
           if (likes !== null && views !== null && views !== 0) {
-            score =  (likes / views) * 100
-            progres_circle(score.toFixed(2))
+            score = (likes / 1000000)
+              // Convert the floating-point number to a string
+              const numString = Math.abs(score).toString();
+
+              // Iterate through the characters and find the first two non-zero digits
+              let countNonZero = 0;
+              let result = '';
+
+              for (let i = 0; i < numString.length && countNonZero < 2; i++) {
+                const digit = numString[i];
+
+                if (digit !== '0' && digit !== '.') {
+                  result += digit;
+                  countNonZero++;
+                } else if (digit === '.') {
+                  // Include the decimal point if encountered
+                  result += digit;
+                }
+              }
+            progres_circle(result * 100)
             // Now you can use the score variable
             console.log('Score:', score);
           } else {
@@ -88,10 +95,10 @@
           console.error('Error fetching data:', error);
         });
       // 
-      
+
       // 
     }
-    function progres_circle(score){
+    function progres_circle(score) {
       const container = document.querySelector(".container");
 
       const courses = [
