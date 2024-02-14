@@ -48,10 +48,11 @@
       ])
         .then(([likes, views]) => {
           if (likes !== null && views !== null && views !== 0) {
-            score = (likes / 1000000)
-              // Convert the floating-point number to a string
-              const numString = Math.abs(score).toString();
+            score = (likes / views)
+            // Convert the floating-point number to a string
+            const numString = Math.abs(score).toString();
 
+            if (numString[0] == '0') {
               // Iterate through the characters and find the first two non-zero digits
               let countNonZero = 0;
               let result = '';
@@ -67,7 +68,12 @@
                   result += digit;
                 }
               }
-            progres_circle(result * 100)
+              progres_circle(result * 100)
+            }
+            else {
+              progres_circle(score.toFixed(2) * 10)
+            }
+
             // Now you can use the score variable
             console.log('Score:', score);
           } else {
