@@ -59,8 +59,8 @@
       ])
         .then(([likes, views]) => {
           if (likes !== null && views !== null && views !== 0) {
-            score =  (views / 999999999) * 100
-            progres_circle(score.toFixed(0))
+            score =  (likes / views) * 100
+            progres_circle(score.toFixed(2))
             // Now you can use the score variable
             console.log('Score:', score);
           } else {
