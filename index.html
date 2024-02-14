@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="input.css">
+
+  <title>YouTube Likes</title>
+</head>
+
+<body>
+  <div class="container flex flex-col justify-center space-y-5 items-center ">
+    <h1 class="font-bold text-4xl mt-16">YouTube Video Ranking</h1>
+
+    <form class="flex flex-col p-24 space-y-4 border bg-slate-400 rounded-lg" id="urlForm">
+      <label class="text-lg font-semibold" for="youtubeUrl">Enter YouTube URL:</label>
+      <input class="rounded-md p-1 shadow-lg w-96" type="text" id="youtubeUrl"
+        placeholder="https://www.youtube.com/watch?v=VIDEO_ID" required>
+      <div class="btn flex justify-center">
+        <button class="bg-[#111B47] text-white p-1 px-2 rounded-md w-fit" type="button" onclick="getLikes()">Get
+          Score</button>
+      </div>
+    </form>
+
+    <div id="likes"></div>
+    <div id="views"></div>
+    <div id="score"></div>
+  </div>
+  <div class="container"></div>
+  <!-- <div class="relative w-40 h-40">
+    <svg class="absolute" width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#3498db" stroke-width="10" stroke-dasharray="283"
+        stroke-dashoffset="0"></circle>
+      <circle class="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3498db" stroke-width="10"
+        stroke-dasharray="283" stroke-dashoffset="0"></circle>
+    </svg>
+    <div class="absolute inset-0 flex items-center justify-center">
+      <span class="text-blue-500 text-lg font-semibold" id="progressText">0%</span>
+    </div>
+  </div> -->
+
+  <script>
+    var a, b, score;
+
+    function getLikes() {
+      const urlInput = document.getElementById('youtubeUrl');
+      const url = urlInput.value;
+
+      // Extract video ID from the URL
+      const videoId = getVideoIdFromUrl(url);
+      const apiKey = 'AIzaSyBJ033WN9EyZXkXQ-GDYvmLE9scrw_4jv8'; // Replace with your YouTube Data API key
+
+      // Use Promise.all to wait for both fetches to complete
+      Promise.all([
+        fetchVideoLikes(videoId, apiKey),
+        fetchVideoViews(videoId, apiKey)
+      ])
+        .then(([likes, views]) => {
+          if (likes !== null && views !== null && views !== 0) {
+            score =  (views / 1000000) * 100
+            progres_circle(score.toFixed(0))
+            // Now you can use the score variable
+            console.log('Score:', score);
+          } else {
+            console.log('Likes or views data is unavailable or views is zero.');
+          }
+
+          // Update likes and views in your HTML elements
+          if (likes !== null) {
+            document.getElementById('likes').innerText = `Likes: ${likes}`;
+            a = likes.toString();
+            console.log(a);
+          } else {
+            console.log('Likes data is unavailable.');
+          }
+
+          if (views !== null) {
+            document.getElementById('views').innerText = `Views: ${views}`;
+            b = views.toString();
+            console.log(b);
+          } else {
+            console.log('Views data is unavailable.');
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+      // 
+      
+      // 
+    }
+    function progres_circle(score){
+      const container = document.querySelector(".container");
+
+      const courses = [
+        { course: "Score", percent: score, color: "#f9ca24" },
+      ];
+
+      courses.forEach((course) => {
+        container.innerHTML += `
+  <div class="progess-group">
+  <div class="circular-progress" >
+    <span class="course-value" style="color:${course.color}">0%</span>
+  </div>
+  <label class="text" style="color:${course.color}">${course.course}</label>
+</div>
+  `;
+      });
+
+      const progressGroups = document.querySelectorAll(".progess-group");
+
+      progressGroups.forEach((progress, index) => {
+        let progressStartValue = 0;
+        let progressStartEnd = courses[index].percent;
+        let speed = 50;
+        let progessTimer = setInterval(() => {
+          progressStartValue++;
+          if (progressStartValue == progressStartEnd) {
+            clearInterval(progessTimer);
+          }
+          progress.querySelector(".circular-progress").style.background = `
+    conic-gradient(${courses[index].color} ${3.6 * progressStartValue}deg, #fff 0deg)`;
+
+          progress.querySelector(".course-value").innerHTML = progressStartValue + "%";
+        }, speed);
+      });
+    }
+    function getVideoIdFromUrl(url) {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      return urlParams.get('v') || url.substr(url.lastIndexOf('/') + 1);
+    }
+    function fetchVideoLikes(videoId, apiKey) {
+      return fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+          // Extract the number of likes from the API response
+          const likes = data.items[0].statistics.likeCount;
+
+          // Return the likes value
+          return likes;
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    function fetchVideoViews(videoId, apiKey) {
+      return fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+          // Extract the number of likes from the API response
+          const views = data.items[0].statistics.viewCount;
+
+          // Return the likes value
+          return views;
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  </script>
+
+</body>
+
+</html>
