@@ -30,6 +30,7 @@
   </div>
   <div class="container"></div>
 
+
   <script>
     var a, b, score;
 
@@ -100,11 +101,9 @@
         .catch(error => {
           console.error('Error fetching data:', error);
         });
-      // 
-
-      // 
     }
-    function progres_circle(score) {
+
+    async function progres_circle(score) {
       const container = document.querySelector(".container");
 
       const courses = [
@@ -113,13 +112,13 @@
 
       courses.forEach((course) => {
         container.innerHTML += `
-  <div class="progess-group">
-  <div class="circular-progress" >
-    <span class="course-value" style="color:${course.color}">0%</span>
-  </div>
-  <label class="text" style="color:${course.color}">${course.course}</label>
-</div>
-  `;
+          <div class="progess-group">
+            <div class="circular-progress">
+              <span class="course-value" style="color:${course.color}">0%</span>
+            </div>
+            <label class="text" style="color:${course.color}">${course.course}</label>
+          </div>
+        `;
       });
 
       const progressGroups = document.querySelectorAll(".progess-group");
@@ -127,14 +126,17 @@
       progressGroups.forEach((progress, index) => {
         let progressStartValue = 0;
         let progressStartEnd = courses[index].percent;
-        let speed = 50;
+        let speed = 500; // Adjust this value to control the speed
+
         let progessTimer = setInterval(() => {
           progressStartValue++;
           if (progressStartValue == progressStartEnd) {
             clearInterval(progessTimer);
           }
+
           progress.querySelector(".circular-progress").style.background = `
-    conic-gradient(${courses[index].color} ${3.6 * progressStartValue}deg, #fff 0deg)`;
+            conic-gradient(${courses[index].color} ${3.6 * progressStartValue}deg, #fff 0deg)
+          `;
 
           progress.querySelector(".course-value").innerHTML = progressStartValue + "%";
         }, speed);
@@ -176,5 +178,7 @@
   </script>
 
 </body>
+
+
 
 </html>
